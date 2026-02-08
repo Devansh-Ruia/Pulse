@@ -46,10 +46,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         new QRCode(document.getElementById('qr-container'), {
             text: qrUrl,
-            width: 48,
-            height: 48,
-            colorDark: '#000000',
-            colorLight: '#ffffff'
+            width: 128,
+            height: 128,
+            colorDark: "#f4f4f4",
+            colorLight: "#393939",
+            correctLevel: QRCode.CorrectLevel.L
         });
 
         // Update room URL

@@ -383,7 +383,7 @@ button, input, .tile {
 .dashboard {
   display: grid;
   grid-template-columns: 1fr 320px;
-  grid-template-rows: 48px 1fr 64px;
+  grid-template-rows: 48px 1fr 96px;
   grid-template-areas:
     "header  header"
     "chart   sidebar"
@@ -420,7 +420,7 @@ button, input, .tile {
   border-top: 1px solid #525252; 
   padding: 0 24px;
   background: #393939;
-  height: 64px;
+  height: 96px;
   display: flex;
   align-items: center;
 }
@@ -445,9 +445,10 @@ button, input, .tile {
   letter-spacing: 2px;
 }
 
-.footer-qr canvas {
-  width: 48px !important;
-  height: 48px !important;
+.footer-qr canvas,
+.footer-qr img {
+  width: 72px !important;
+  height: 72px !important;
 }
 
 .footer-url {
