@@ -152,7 +152,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 break;
                 
             case 'user_count':
-                attendeeCount.textContent = message.count;
+                const count = message.count;
+                attendeeCount.textContent = count;
+                // Update people/person text
+                const peopleText = document.querySelector('.dashboard-header .label-01');
+                peopleText.textContent = count === 1 ? ' person' : ' people';
                 break;
                 
             case 'error':
@@ -198,11 +202,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Update label
         let label = 'Neutral';
-        if (value < 0.2) label = 'Cold';
-        else if (value < 0.4) label = 'Cool';
+        if (value < 0.2) label = 'Disengaged';
+        else if (value < 0.4) label = 'Not feeling it';
         else if (value < 0.6) label = 'Neutral';
-        else if (value < 0.8) label = 'Warm';
-        else label = 'Hot';
+        else if (value < 0.8) label = 'Engaged';
+        else label = 'Loving it';
         
         sentimentLabel.textContent = label;
     }
