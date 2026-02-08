@@ -5,20 +5,20 @@ const AlienBridge = {
     if (window.alien && window.alien.getIdentity) {
       return await window.alien.getIdentity();
     }
-    // Fallback to mock for local dev
-    const script = document.createElement('script');
-    script.src = '/alien-mock.js';
-    document.head.appendChild(script);
-    await new Promise(r => setTimeout(r, 100));
-    return await window.alien.getIdentity();
+    return {
+      alienId: "dev_user_" + Math.random().toString(36).substr(2, 8),
+      verified: true
+    };
   },
-  
-  async requestPayment(params) {
+
+  async requestPayment({ to, amount }) {
     if (window.alien && window.alien.requestPayment) {
-      return await window.alien.requestPayment(params);
+      return await window.alien.requestPayment({ to, amount });
     }
-    // Fallback mock
-    return { success: true, txId: 'mock_tx_' + Date.now() };
+    const confirmed = confirm(`[DEV MODE] Simulate paying $${amount}?`);
+    return confirmed
+      ? { success: true, txId: "mock_tx_" + Date.now() }
+      : { success: false, txId: null };
   }
 };
 

@@ -3,43 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pulse - Live Event Sentiment & Tipping</title>
+    <title>Pulse</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="min-h-screen flex items-center justify-center">
-    <div class="container">
-        <div class="card max-w-md mx-auto">
-            <div class="text-center mb-6">
-                <h1 class="mb-2">Pulse</h1>
-                <p class="text-secondary">Real-time event sentiment & micro-tipping</p>
+    <div class="container container-448">
+        <div class="tile">
+            <div class="header">
+                <div class="heading-05">PULSE</div>
+                <div class="helper-01">Real-time audience sentiment for live events</div>
             </div>
             
-            <div class="flex flex-col gap-4">
-                <button id="createRoomBtn" class="btn btn-primary w-full">
-                    Create Room
-                </button>
+            <div class="flex flex-col gap-32">
+                <div class="tile">
+                    <div class="heading-02">Create a room</div>
+                    <div class="flex flex-col gap-16">
+                        <div class="label-01">Room title</div>
+                        <input 
+                            type="text" 
+                            id="roomTitleInput" 
+                            class="text-input" 
+                            placeholder="Enter room title"
+                        >
+                        <button id="createRoomBtn" class="btn-primary">
+                            Create room
+                        </button>
+                    </div>
+                </div>
                 
-                <div class="text-center text-secondary">or</div>
-                
-                <div class="flex flex-col gap-3">
-                    <input 
-                        type="text" 
-                        id="roomCodeInput" 
-                        class="input room-input" 
-                        placeholder="Enter room code (e.g., ABC123)"
-                        maxlength="6"
-                        aria-label="Room code"
-                    >
-                    <button id="joinRoomBtn" class="btn btn-secondary w-full">
-                        Join Room
-                    </button>
+                <div class="tile">
+                    <div class="heading-02">Join a room</div>
+                    <div class="flex flex-col gap-16">
+                        <div class="label-01">Room code</div>
+                        <input 
+                            type="text" 
+                            id="roomCodeInput" 
+                            class="text-input room-code-input" 
+                            placeholder="Enter room code"
+                            maxlength="6"
+                        >
+                        <button id="joinRoomBtn" class="btn-ghost">
+                            Join room
+                        </button>
+                    </div>
                 </div>
             </div>
             
-            <div class="mt-6 text-center">
-                <p class="text-secondary font-size-sm">
-                    Powered by <span class="accent-text">Alien</span> • One human, one voice
-                </p>
+            <div class="footer">
+                <div class="helper-01">Built for the Alien ecosystem</div>
             </div>
         </div>
     </div>
@@ -49,17 +60,21 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const createBtn = document.getElementById('createRoomBtn');
             const joinBtn = document.getElementById('joinRoomBtn');
+            const roomTitleInput = document.getElementById('roomTitleInput');
             const roomInput = document.getElementById('roomCodeInput');
             
             // Create room handler
             createBtn.addEventListener('click', async () => {
+                const title = roomTitleInput.value.trim();
+                if (!title) {
+                    showToast('Please enter a room title');
+                    return;
+                }
+                
+                const speakerWallet = prompt('Enter speaker wallet address:');
+                if (!speakerWallet) return;
+                
                 try {
-                    const title = prompt('Enter room title:');
-                    if (!title) return;
-                    
-                    const speakerWallet = prompt('Enter speaker wallet address:');
-                    if (!speakerWallet) return;
-                    
                     // Get identity
                     const identity = await AlienBridge.getIdentity();
                     
@@ -114,7 +129,7 @@
                     
                 } catch (error) {
                     console.error('Error joining room:', error);
-                    showToast('Room not found. Please check the code and try again.');
+                    showToast('Room not found. Please check code and try again.');
                 }
             });
             

@@ -10,6 +10,9 @@ const wss = new WebSocket.Server({ server });
 const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
 
+// Favicon route to prevent 404 errors
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // In-memory data store
 const rooms = new Map();
 
@@ -42,11 +45,15 @@ app.use(express.static('public'));
 app.post('/api/rooms', (req, res) => {
   const { title, hostId, speakerWallet } = req.body;
   
+  console.log('Creating room with:', { title, hostId, speakerWallet });
+  
   if (!title || !hostId || !speakerWallet) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   const roomId = generateRoomId();
+  console.log('Generated room ID:', roomId);
+  
   const room = {
     id: roomId,
     hostId,
@@ -62,6 +69,7 @@ app.post('/api/rooms', (req, res) => {
   };
 
   rooms.set(roomId, room);
+  console.log('Room stored. Total rooms:', rooms.size);
 
   // Start sentiment aggregation for this room
   const sentimentInterval = setInterval(() => {
@@ -99,11 +107,17 @@ app.post('/api/rooms', (req, res) => {
 });
 
 app.get('/api/rooms/:roomId', (req, res) => {
-  const room = rooms.get(req.params.roomId);
+  const requestedRoomId = req.params.roomId;
+  console.log('Looking for room:', requestedRoomId);
+  console.log('Available rooms:', Array.from(rooms.keys()));
+  
+  const room = rooms.get(requestedRoomId);
   if (!room) {
+    console.log('Room not found:', requestedRoomId);
     return res.status(404).json({ error: 'Room not found' });
   }
   
+  console.log('Room found:', room.title);
   res.json({
     title: room.title,
     speakerWallet: room.speakerWallet,
@@ -246,6 +260,6 @@ wss.on('connection', (ws) => {
   });
 });
 
-server.listen(PORT, HOST, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Pulse server running on http://${HOST}:${PORT}`);
 });

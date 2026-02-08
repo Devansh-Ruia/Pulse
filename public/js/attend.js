@@ -8,6 +8,9 @@ let currentSentiment = 0.5;
 document.addEventListener('DOMContentLoaded', async () => {
     // Get room ID from URL
     roomId = getUrlParam('room');
+    console.log('Attendee page - room ID from URL:', roomId);
+    console.log('Full URL:', window.location.search);
+    
     if (!roomId) {
         showToast('No room ID provided');
         return;
@@ -16,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get elements
     const roomTitle = document.getElementById('roomTitle');
     const sentimentSlider = document.getElementById('sentimentSlider');
-    const sentimentEmoji = document.getElementById('sentimentEmoji');
     const sentimentValue = document.getElementById('sentimentValue');
     const connectionDot = document.getElementById('connectionDot');
     const tipFeed = document.getElementById('tipFeed');
@@ -24,7 +26,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         // Get room info
+        console.log('Fetching room info for:', roomId);
         const response = await fetch(`/api/rooms/${roomId}`);
+        console.log('Response status:', response.status);
+        
         if (!response.ok) {
             throw new Error('Room not found');
         }
@@ -58,9 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentSentiment = value;
             
             // Update UI
-            sentimentEmoji.textContent = sentimentToEmoji(value);
-            sentimentValue.textContent = `${Math.round(value * 100)}%`;
-            sentimentEmoji.style.color = sentimentToColor(value);
+            sentimentValue.textContent = value.toFixed(2);
             
             // Send to server
             sendSentiment(value);
@@ -91,17 +94,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                         // Show confirmation
                         showToast(`✓ Tipped ${formatCurrency(amount)}!`);
                         
-                        // Brief button animation
-                        btn.style.background = 'var(--tip-highlight)';
-                        btn.style.color = 'var(--bg-primary)';
+                        // Brief button flash
+                        btn.style.background = 'var(--cds-support-success)';
+                        btn.style.color = 'var(--cds-text-on-color)';
                         setTimeout(() => {
                             btn.style.background = '';
                             btn.style.color = '';
-                        }, 500);
+                        }, 300);
                     }
                 } catch (error) {
                     console.error('Payment error:', error);
-                    // Silent fail or show subtle message
+                    // Silent fail or subtle message
                 }
             });
         });
@@ -114,7 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function handleMessage(message) {
         switch (message.type) {
             case 'room_info':
-                // Room info already fetched, but update if needed
+                // Room info already fetched
                 break;
                 
             case 'snapshot':
@@ -141,14 +144,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function addTipToFeed(amount) {
+        // Clear "no tips" message if present
+        const noTipsMsg = tipFeed.querySelector('.helper-01');
+        if (noTipsMsg) {
+            noTipsMsg.remove();
+        }
+        
         const tipItem = document.createElement('div');
-        tipItem.className = 'tip-feed-item tip-item';
-        tipItem.textContent = `🎉 Someone tipped ${formatCurrency(amount)}!`;
+        tipItem.className = 'tip-feed-item';
+        tipItem.innerHTML = `
+            <div class="tip-amount">${formatCurrency(amount)}</div>
+            <div class="helper-01">${formatTime(Date.now())}</div>
+        `;
         
         tipFeed.insertBefore(tipItem, tipFeed.firstChild);
         
-        // Keep only last 5 tips
-        while (tipFeed.children.length > 5) {
+        // Keep only last 10 tips
+        while (tipFeed.children.length > 10) {
             tipFeed.removeChild(tipFeed.lastChild);
         }
         
@@ -161,7 +173,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Initialize sentiment display
-    sentimentEmoji.textContent = sentimentToEmoji(currentSentiment);
-    sentimentValue.textContent = `${Math.round(currentSentiment * 100)}%`;
-    sentimentEmoji.style.color = sentimentToColor(currentSentiment);
+    sentimentValue.textContent = currentSentiment.toFixed(2);
 });

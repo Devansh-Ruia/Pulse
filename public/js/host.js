@@ -4,7 +4,6 @@ let roomId = null;
 let alienId = null;
 let sentimentChart = null;
 let sentimentData = [];
-let maxDataPoints = 60; // 5 minutes of data (1 point per 5 seconds)
 
 document.addEventListener('DOMContentLoaded', async () => {
     // Get room ID from URL
@@ -20,8 +19,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const attendeeCount = document.getElementById('attendeeCount');
     const totalTips = document.getElementById('totalTips');
     const totalTipsHeader = document.getElementById('totalTipsHeader');
+    const sentimentGauge = document.getElementById('sentimentGauge');
+    const sentimentLabel = document.getElementById('sentimentLabel');
     const tipList = document.getElementById('tipList');
-    const gaugeValue = document.getElementById('gaugeValue');
+    const hostUrl = document.getElementById('hostUrl');
 
     try {
         // Get room info
@@ -33,26 +34,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         roomTitle.textContent = roomInfo.title;
         roomCode.textContent = roomId.toUpperCase();
 
-        // Generate QR code
-        const qrUrl = `${window.location.origin}/attend.html?room=${roomId}`;
-        new QRCode(document.getElementById('qrcode'), {
-            text: qrUrl,
-            width: 200,
-            height: 200,
-            colorDark: '#ffffff',
-            colorLight: '#0a0a0f',
-            correctLevel: QRCode.CorrectLevel.L
-        });
-
         // Get identity
         const identity = await AlienBridge.getIdentity();
         alienId = identity.alienId;
 
+        // Generate QR code
+        const baseUrl = window.location.hostname === 'localhost' 
+            ? `http://localhost:3000` 
+            : window.location.origin;
+        const qrUrl = `${baseUrl}/attend.html?room=${roomId}`;
+        
+        new QRCode(document.getElementById('qrcode'), {
+            text: qrUrl,
+            width: 200,
+            height: 200,
+            colorDark: '#000000',
+            colorLight: '#ffffff'
+        });
+
+        // Update host URL
+        if (window.location.hostname !== 'localhost') {
+            hostUrl.textContent = window.location.hostname;
+        }
+
         // Initialize chart
         initializeChart();
-
-        // Initialize gauge
-        drawGauge(0);
 
         // Create WebSocket connection
         ws = createWebSocket(
@@ -79,66 +85,49 @@ document.addEventListener('DOMContentLoaded', async () => {
                 datasets: [{
                     label: 'Average Sentiment',
                     data: [],
-                    borderColor: '#00d4ff',
-                    backgroundColor: 'rgba(0, 212, 255, 0.1)',
-                    borderWidth: 3,
-                    tension: 0.4,
-                    fill: true,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#00d4ff',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2
+                    borderColor: '#4589ff',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    fill: false
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(26, 26, 46, 0.9)',
-                        titleColor: '#ffffff',
-                        bodyColor: '#8888aa',
-                        borderColor: '#2a2a3e',
-                        borderWidth: 1,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return `Sentiment: ${Math.round(context.parsed.y * 100)}%`;
-                            }
-                        }
-                    }
-                },
+                animation: { duration: 300 },
                 scales: {
                     x: {
-                        grid: {
-                            color: '#2a2a3e',
-                            borderColor: '#2a2a3e'
-                        },
-                        ticks: {
-                            color: '#8888aa',
-                            maxRotation: 0
-                        }
+                        grid: { color: '#525252', drawBorder: false },
+                        ticks: { color: '#c6c6c6', font: { family: 'IBM Plex Mono', size: 12 } }
                     },
                     y: {
-                        min: 0,
-                        max: 1,
-                        grid: {
-                            color: '#2a2a3e',
-                            borderColor: '#2a2a3e'
-                        },
-                        ticks: {
-                            color: '#8888aa',
+                        min: 0, max: 1,
+                        grid: { color: '#525252', drawBorder: false },
+                        ticks: { 
+                            color: '#c6c6c6', 
+                            font: { family: 'IBM Plex Mono', size: 12 },
                             callback: function(value) {
                                 return Math.round(value * 100) + '%';
                             }
                         }
                     }
                 },
-                animation: {
-                    duration: 500
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#393939',
+                        titleColor: '#f4f4f4',
+                        bodyColor: '#c6c6c6',
+                        borderColor: '#525252',
+                        borderWidth: 1,
+                        cornerRadius: 0,
+                        titleFont: { family: 'IBM Plex Sans', weight: '600' },
+                        bodyFont: { family: 'IBM Plex Mono' }
+                    }
+                },
+                elements: {
+                    line: { borderColor: '#4589ff', borderWidth: 2, tension: 0.1 },
+                    point: { backgroundColor: '#4589ff', radius: 0, hitRadius: 8, hoverRadius: 4 }
                 }
             }
         });
@@ -152,11 +141,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
             case 'snapshot':
                 updateSentimentChart(message);
-                updateGauge(message.avg);
+                updateSentimentGauge(message.avg);
                 break;
                 
             case 'tip_event':
-                updateTips(message);
+                updateTips(message.totalTips);
                 addTipToFeed(message);
                 break;
                 
@@ -184,86 +173,74 @@ document.addEventListener('DOMContentLoaded', async () => {
             timestamp: data.ts
         });
 
-        // Keep only last maxDataPoints
-        if (sentimentData.length > maxDataPoints) {
-            sentimentData.shift();
+        // Keep only last 60 data points (5 minutes)
+        if (sentimentData.length > 60) {
+            sentimentData = sentimentData.slice(-60);
         }
 
         // Update chart
         sentimentChart.data.labels = sentimentData.map(d => d.time);
         sentimentChart.data.datasets[0].data = sentimentData.map(d => d.value);
         
-        // Update line color based on sentiment
-        const avgSentiment = data.avg;
-        const color = sentimentToColor(avgSentiment);
-        sentimentChart.data.datasets[0].borderColor = color;
-        sentimentChart.data.datasets[0].pointBackgroundColor = color;
+        // Update line color based on current sentiment
+        const currentColor = interpolateColor(data.avg);
+        sentimentChart.data.datasets[0].borderColor = currentColor;
+        sentimentChart.data.datasets[0].pointBackgroundColor = currentColor;
         
-        sentimentChart.update('none'); // No animation for smooth real-time updates
+        sentimentChart.update('none');
     }
 
-    function updateGauge(value) {
-        const percentage = Math.round(value * 100);
-        gaugeValue.textContent = `${percentage}%`;
-        gaugeValue.style.color = sentimentToColor(value);
-        drawGauge(value);
-    }
-
-    function drawGauge(value) {
-        const canvas = document.getElementById('gaugeCanvas');
-        const ctx = canvas.getContext('2d');
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height - 10;
-        const radius = 80;
-
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Draw background arc
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, Math.PI, 2 * Math.PI, false);
-        ctx.lineWidth = 15;
-        ctx.strokeStyle = '#2a2a3e';
-        ctx.stroke();
-
-        // Draw value arc
-        const startAngle = Math.PI;
-        const endAngle = Math.PI + (Math.PI * value);
+    function updateSentimentGauge(value) {
+        sentimentGauge.textContent = value.toFixed(2);
+        sentimentGauge.style.color = interpolateColor(value);
         
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, startAngle, endAngle, false);
-        ctx.lineWidth = 15;
-        ctx.strokeStyle = sentimentToColor(value);
-        ctx.lineCap = 'round';
-        ctx.stroke();
+        // Update label
+        let label = 'Neutral';
+        if (value < 0.2) label = 'Cold';
+        else if (value < 0.4) label = 'Cool';
+        else if (value < 0.6) label = 'Neutral';
+        else if (value < 0.8) label = 'Warm';
+        else label = 'Hot';
+        
+        sentimentLabel.textContent = label;
     }
 
-    function updateTips(data) {
-        const formattedTotal = formatCurrency(data.totalTips);
-        totalTips.textContent = formattedTotal;
-        totalTipsHeader.textContent = formattedTotal;
+    function updateTips(total) {
+        const formatted = formatCurrency(total);
+        totalTips.textContent = formatted;
+        totalTipsHeader.textContent = formatted;
     }
 
     function addTipToFeed(data) {
         // Clear "no tips" message if present
-        if (tipList.querySelector('.text-secondary')) {
-            tipList.innerHTML = '';
+        const noTipsMsg = tipList.querySelector('.helper-01');
+        if (noTipsMsg) {
+            noTipsMsg.remove();
         }
-
+        
         const tipItem = document.createElement('div');
-        tipItem.className = 'tip-item tip-item';
+        tipItem.className = 'tip-feed-item';
         tipItem.innerHTML = `
-            <div>
-                <div class="tip-amount">${formatCurrency(data.amount)}</div>
-                <div class="tip-time">${formatTime(data.ts)}</div>
-            </div>
+            <div class="tip-amount">${formatCurrency(data.amount)}</div>
+            <div class="helper-01">${formatTime(data.ts)}</div>
         `;
-
+        
         tipList.insertBefore(tipItem, tipList.firstChild);
-
-        // Keep only last 20 tips
-        while (tipList.children.length > 20) {
+        
+        // Keep only last 10 tips
+        while (tipList.children.length > 10) {
             tipList.removeChild(tipList.lastChild);
         }
+    }
+
+    function interpolateColor(value) {
+        const cold = { r: 69, g: 137, b: 255 };  // #4589ff
+        const hot = { r: 218, g: 30, b: 40 };     // #da1e28
+        
+        const r = Math.round(cold.r + (hot.r - cold.r) * value);
+        const g = Math.round(cold.g + (hot.g - cold.g) * value);
+        const b = Math.round(cold.b + (hot.b - cold.b) * value);
+        
+        return `rgb(${r}, ${g}, ${b})`;
     }
 });

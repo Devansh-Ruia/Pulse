@@ -5,131 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pulse - Attendee</title>
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        .attendee-container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: var(--space-4);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .room-header {
-            text-align: center;
-            margin-bottom: var(--space-6);
-        }
-        
-        .sentiment-display {
-            text-align: center;
-            margin-bottom: var(--space-4);
-        }
-        
-        .sentiment-emoji {
-            font-size: 4rem;
-            line-height: 1;
-            margin-bottom: var(--space-2);
-            transition: all 0.3s ease;
-        }
-        
-        .sentiment-value {
-            font-size: var(--font-size-lg);
-            color: var(--text-secondary);
-            margin-bottom: var(--space-6);
-        }
-        
-        .slider-container {
-            margin-bottom: var(--space-8);
-        }
-        
-        .slider-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: var(--space-2);
-            font-size: var(--font-size-lg);
-        }
-        
-        .tip-buttons {
-            display: flex;
-            gap: var(--space-3);
-            margin-bottom: var(--space-6);
-        }
-        
-        .tip-btn {
-            flex: 1;
-            font-size: var(--font-size-lg);
-            font-weight: 600;
-        }
-        
-        .tip-feed {
-            margin-top: auto;
-            padding-top: var(--space-4);
-            border-top: 1px solid var(--border-color);
-        }
-        
-        .tip-feed-title {
-            font-size: var(--font-size-sm);
-            color: var(--text-secondary);
-            margin-bottom: var(--space-2);
-        }
-        
-        .tip-feed-item {
-            font-size: var(--font-size-sm);
-            color: var(--tip-highlight);
-            margin-bottom: var(--space-1);
-            opacity: 0.8;
-        }
-        
-        .connection-status {
-            position: absolute;
-            top: var(--space-4);
-            right: var(--space-4);
-        }
-    </style>
 </head>
 <body>
-    <div class="attendee-container">
-        <div class="connection-status">
-            <div id="connectionDot" class="connection-dot disconnected"></div>
-        </div>
-        
-        <div class="room-header">
-            <h2 id="roomTitle" class="mb-2">Loading...</h2>
-            <p class="text-secondary">Share your sentiment & support</p>
-        </div>
-        
-        <div class="sentiment-display">
-            <div id="sentimentEmoji" class="sentiment-emoji">😐</div>
-            <div id="sentimentValue" class="sentiment-value">50%</div>
-        </div>
-        
-        <div class="slider-container">
-            <div class="slider-labels">
-                <span>🧊</span>
-                <span>🔥</span>
+    <div class="container">
+        <div class="header">
+            <div class="heading-02">Room: <span id="roomTitle">Loading...</span></div>
+            <div class="flex items-center gap-8">
+                <div id="connectionDot" class="connection-dot disconnected"></div>
+                <div class="label-01">Connected</div>
             </div>
-            <input 
-                type="range" 
-                id="sentimentSlider" 
-                class="sentiment-slider"
-                min="0" 
-                max="1" 
-                step="0.01" 
-                value="0.5"
-                aria-label="Sentiment slider"
-                title="Drag to adjust sentiment from cold to hot"
-            >
         </div>
         
-        <div class="tip-buttons">
-            <button class="btn btn-secondary tip-btn" data-amount="0.50">$0.50</button>
-            <button class="btn btn-secondary tip-btn" data-amount="1">$1</button>
-            <button class="btn btn-secondary tip-btn" data-amount="2">$2</button>
-        </div>
-        
-        <div class="tip-feed">
-            <div class="tip-feed-title">LIVE TIPS</div>
-            <div id="tipFeed"></div>
+        <div class="flex flex-col gap-32">
+            <div class="tile">
+                <div class="heading-03">How are you feeling?</div>
+                <div class="flex justify-between items-center gap-16">
+                    <div class="label-01">Cool</div>
+                    <div class="label-01">Hot</div>
+                </div>
+                <input 
+                    type="range" 
+                    id="sentimentSlider" 
+                    class="sentiment-slider"
+                    min="0" 
+                    max="1" 
+                    step="0.01" 
+                    value="0.5"
+                    aria-label="Sentiment slider"
+                >
+                <div class="text-center">
+                    <div id="sentimentValue" class="data-medium">0.50</div>
+                </div>
+            </div>
+            
+            <div class="tile">
+                <div class="heading-01">Tip the speaker</div>
+                <div class="flex gap-16">
+                    <button class="btn-ghost tip-btn" data-amount="0.50">
+                        <span class="data-small">$0.50</span>
+                    </button>
+                    <button class="btn-ghost tip-btn" data-amount="1">
+                        <span class="data-small">$1.00</span>
+                    </button>
+                    <button class="btn-ghost tip-btn" data-amount="2">
+                        <span class="data-small">$2.00</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tile">
+                <div class="label-01">Latest</div>
+                <div id="tipFeed" class="flex flex-col gap-8">
+                    <div class="helper-01">No tips yet...</div>
+                </div>
+            </div>
         </div>
     </div>
 
