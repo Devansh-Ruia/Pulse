@@ -363,6 +363,60 @@ button, input, .tile {
     height: 100%;
 }
 
+/* Landing Page Specific */
+.landing-page {
+  background: #262626;
+}
+
+.landing-container {
+  padding-top: var(--space-32);
+  padding-bottom: var(--space-32);
+}
+
+.landing-title {
+  font-size: 32px;
+  font-weight: 300;
+  letter-spacing: 0;
+  margin-bottom: var(--space-8);
+}
+
+.landing-tagline {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--cds-text-secondary);
+  margin-bottom: var(--space-32);
+}
+
+.landing-tiles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  margin-bottom: var(--space-24);
+}
+
+.landing-tile {
+  background: var(--cds-layer-01);
+  padding: var(--space-24);
+  border-radius: 0;
+}
+
+.landing-tile .heading-02 {
+  margin-bottom: var(--space-16);
+}
+
+.landing-tile .label-01 {
+  margin-bottom: var(--space-8);
+}
+
+.landing-tile .text-input {
+  margin-bottom: var(--space-24);
+}
+
+.landing-footer {
+  margin-top: var(--space-24);
+  padding-top: var(--space-24);
+}
+
 /* Layout Utilities */
 .container {
   max-width: 1200px;
@@ -393,7 +447,6 @@ button, input, .tile {
 /* Room Code Input */
 .room-code-input {
   font-family: 'IBM Plex Mono', monospace;
-  text-transform: uppercase;
   text-align: center;
 }
 

@@ -6,52 +6,46 @@
     <title>Pulse</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body class="min-h-screen flex items-center justify-center">
-    <div class="container container-448">
-        <div class="tile">
-            <div class="header">
-                <div class="heading-05">PULSE</div>
-                <div class="helper-01">Real-time audience sentiment for live events</div>
+<body class="min-h-screen flex items-center justify-center landing-page">
+    <div class="container container-448 landing-container">
+        <div class="text-center">
+            <div class="landing-title">PULSE</div>
+            <div class="landing-tagline">Real-time audience sentiment for live events</div>
+        </div>
+        
+        <div class="landing-tiles">
+            <div class="landing-tile">
+                <div class="heading-02">Create a room</div>
+                <div class="label-01">Room title</div>
+                <input 
+                    type="text" 
+                    id="roomTitleInput" 
+                    class="text-input" 
+                    placeholder="Enter room title"
+                >
+                <button id="createRoomBtn" class="btn-primary">
+                    Create room
+                </button>
             </div>
             
-            <div class="flex flex-col gap-32">
-                <div class="tile">
-                    <div class="heading-02">Create a room</div>
-                    <div class="flex flex-col gap-16">
-                        <div class="label-01">Room title</div>
-                        <input 
-                            type="text" 
-                            id="roomTitleInput" 
-                            class="text-input" 
-                            placeholder="Enter room title"
-                        >
-                        <button id="createRoomBtn" class="btn-primary">
-                            Create room
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="tile">
-                    <div class="heading-02">Join a room</div>
-                    <div class="flex flex-col gap-16">
-                        <div class="label-01">Room code</div>
-                        <input 
-                            type="text" 
-                            id="roomCodeInput" 
-                            class="text-input room-code-input" 
-                            placeholder="Enter room code"
-                            maxlength="6"
-                        >
-                        <button id="joinRoomBtn" class="btn-ghost">
-                            Join room
-                        </button>
-                    </div>
-                </div>
+            <div class="landing-tile">
+                <div class="heading-02">Join a room</div>
+                <div class="label-01">Room code</div>
+                <input 
+                    type="text" 
+                    id="roomCodeInput" 
+                    class="text-input room-code-input" 
+                    placeholder="Enter room code"
+                    maxlength="6"
+                >
+                <button id="joinRoomBtn" class="btn-ghost">
+                    Join room
+                </button>
             </div>
-            
-            <div class="footer">
-                <div class="helper-01">Built for the Alien ecosystem</div>
-            </div>
+        </div>
+        
+        <div class="landing-footer text-center">
+            <div class="helper-01">Built for the Alien ecosystem</div>
         </div>
     </div>
 
