@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sentimentGauge = document.getElementById('sentimentGauge');
     const sentimentLabel = document.getElementById('sentimentLabel');
     const tipList = document.getElementById('tipList');
-    const hostUrl = document.getElementById('hostUrl');
+    const roomUrl = document.getElementById('roomUrl');
 
     try {
         // Get room info
@@ -44,18 +44,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             : window.location.origin;
         const qrUrl = `${baseUrl}/attend.html?room=${roomId}`;
         
-        new QRCode(document.getElementById('qrcode'), {
+        new QRCode(document.getElementById('qr-container'), {
             text: qrUrl,
-            width: 200,
-            height: 200,
+            width: 48,
+            height: 48,
             colorDark: '#000000',
             colorLight: '#ffffff'
         });
 
-        // Update host URL
-        if (window.location.hostname !== 'localhost') {
-            hostUrl.textContent = window.location.hostname;
-        }
+        // Update room URL
+        roomUrl.textContent = `${window.location.hostname}/attend.html?room=${roomId}`;
 
         // Initialize chart
         initializeChart();
@@ -96,20 +94,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 maintainAspectRatio: false,
                 animation: { duration: 300 },
                 scales: {
-                    x: {
-                        grid: { color: '#525252', drawBorder: false },
-                        ticks: { color: '#c6c6c6', font: { family: 'IBM Plex Mono', size: 12 } }
-                    },
                     y: {
-                        min: 0, max: 1,
-                        grid: { color: '#525252', drawBorder: false },
-                        ticks: { 
-                            color: '#c6c6c6', 
-                            font: { family: 'IBM Plex Mono', size: 12 },
-                            callback: function(value) {
-                                return Math.round(value * 100) + '%';
-                            }
-                        }
+                        min: 0,
+                        max: 1,
+                        ticks: {
+                            stepSize: 0.2,
+                            callback: function(value) { return value.toFixed(1); },
+                            color: '#c6c6c6',
+                            font: { family: 'IBM Plex Mono', size: 12 }
+                        },
+                        grid: { color: '#525252', drawBorder: false }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#c6c6c6',
+                            font: { family: 'IBM Plex Mono', size: 12 }
+                        },
+                        grid: { color: '#525252', drawBorder: false }
                     }
                 },
                 plugins: {
@@ -183,7 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         sentimentChart.data.datasets[0].data = sentimentData.map(d => d.value);
         
         // Update line color based on current sentiment
-        const currentColor = interpolateColor(data.avg);
+        const currentColor = getSentimentColor(data.avg);
         sentimentChart.data.datasets[0].borderColor = currentColor;
         sentimentChart.data.datasets[0].pointBackgroundColor = currentColor;
         
@@ -192,7 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateSentimentGauge(value) {
         sentimentGauge.textContent = value.toFixed(2);
-        sentimentGauge.style.color = interpolateColor(value);
+        sentimentGauge.style.color = getSentimentColor(value);
         
         // Update label
         let label = 'Neutral';
@@ -208,7 +209,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateTips(total) {
         const formatted = formatCurrency(total);
         totalTips.textContent = formatted;
-        totalTipsHeader.textContent = formatted;
+        if (totalTipsHeader) {
+            totalTipsHeader.textContent = formatted;
+        }
     }
 
     function addTipToFeed(data) {
@@ -219,28 +222,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         const tipItem = document.createElement('div');
-        tipItem.className = 'tip-feed-item';
+        tipItem.className = 'tip-entry';
         tipItem.innerHTML = `
-            <div class="tip-amount">${formatCurrency(data.amount)}</div>
-            <div class="helper-01">${formatTime(data.ts)}</div>
+            <span class="tip-amount">${formatCurrency(data.amount)}</span>
+            <span class="tip-time">${formatTime(data.ts)}</span>
         `;
         
         tipList.insertBefore(tipItem, tipList.firstChild);
         
-        // Keep only last 10 tips
-        while (tipList.children.length > 10) {
+        // Keep only last 8 visible tips
+        while (tipList.children.length > 8) {
             tipList.removeChild(tipList.lastChild);
         }
     }
 
-    function interpolateColor(value) {
-        const cold = { r: 69, g: 137, b: 255 };  // #4589ff
-        const hot = { r: 218, g: 30, b: 40 };     // #da1e28
-        
-        const r = Math.round(cold.r + (hot.r - cold.r) * value);
-        const g = Math.round(cold.g + (hot.g - cold.g) * value);
-        const b = Math.round(cold.b + (hot.b - cold.b) * value);
-        
-        return `rgb(${r}, ${g}, ${b})`;
+    function getSentimentColor(value) {
+        if (value <= 0.5) {
+            // Blue to white
+            const t = value / 0.5;
+            const r = Math.round(69 + (244 - 69) * t);
+            const g = Math.round(137 + (244 - 137) * t);
+            const b = Math.round(255 + (244 - 255) * t);
+            return `rgb(${r},${g},${b})`;
+        } else {
+            // White to red
+            const t = (value - 0.5) / 0.5;
+            const r = Math.round(244 + (218 - 244) * t);
+            const g = Math.round(244 + (30 - 244) * t);
+            const b = Math.round(244 + (40 - 244) * t);
+            return `rgb(${r},${g},${b})`;
+        }
     }
 });
