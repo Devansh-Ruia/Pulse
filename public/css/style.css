@@ -537,6 +537,36 @@ button, input, .tile {
   overflow: hidden;
 }
 
+/* Tip Buttons */
+.tip-buttons {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.tip-btn {
+  flex: 1;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 16px;
+  font-weight: 500;
+  background: transparent;
+  color: #4589ff;
+  border: 1px solid #4589ff;
+  border-radius: 0;
+  cursor: pointer;
+  padding: 12px 0;
+  transition: background-color 70ms;
+}
+
+.tip-btn:hover,
+.tip-btn:active {
+  background: rgba(69, 137, 255, 0.1);
+}
+
 /* Landing Page Specific */
 .landing-page {
   background: #262626;
