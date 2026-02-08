@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse - Host Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        .host-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-6);
+            min-height: 100vh;
+        }
+        
+        .host-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-6);
+        }
+        
+        .room-info h1 {
+            margin-bottom: var(--space-2);
+        }
+        
+        .qr-section {
+            text-align: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+        }
+        
+        #qrcode {
+            margin: var(--space-4) auto;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .room-code {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.2em;
+            margin-top: var(--space-2);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+        
+        .chart-section {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+        }
+        
+        .stats-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+        
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            text-align: center;
+        }
+        
+        .sentiment-gauge {
+            position: relative;
+            width: 200px;
+            height: 100px;
+            margin: 0 auto var(--space-4);
+        }
+        
+        .gauge-arc {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .gauge-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+        }
+        
+        .stat-number {
+            font-size: var(--font-size-4xl);
+            font-weight: 700;
+            margin-bottom: var(--space-2);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: var(--font-size-lg);
+        }
+        
+        .tip-feed-section {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .tip-feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+        
+        .total-tips {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--tip-highlight);
+        }
+        
+        .tip-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+        
+        .tip-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3);
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--tip-highlight);
+        }
+        
+        .tip-amount {
+            font-weight: 600;
+            color: var(--tip-highlight);
+        }
+        
+        .tip-time {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-section {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: var(--space-4);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="host-container">
+        <div class="host-header">
+            <div class="room-info">
+                <h1 id="roomTitle">Loading...</h1>
+                <p class="text-secondary">Live Event Dashboard</p>
+            </div>
+            <div class="qr-section">
+                <h3>Join the Event</h3>
+                <div id="qrcode" class="qr-container"></div>
+                <div class="room-code" id="roomCode">LOADING</div>
+                <p class="text-secondary font-size-sm">Scan or enter code</p>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="chart-section">
+                <h2>Live Sentiment</h2>
+                <canvas id="sentimentChart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="sentiment-gauge">
+                        <canvas id="gaugeCanvas" class="gauge-arc" width="200" height="100"></canvas>
+                        <div class="gauge-value" id="gaugeValue">--</div>
+                    </div>
+                    <div class="stat-label">Current Sentiment</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number" id="attendeeCount">--</div>
+                    <div class="stat-label">👥 Humans Connected</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number" id="totalTips">$0</div>
+                    <div class="stat-label">💰 Total Tips</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tip-feed-section">
+            <div class="tip-feed-header">
+                <h2>Tip Feed</h2>
+                <div class="total-tips" id="totalTipsHeader">$0.00</div>
+            </div>
+            <div class="tip-list" id="tipList">
+                <p class="text-secondary">No tips yet...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/shared.js"></script>
+    <script src="/js/host.js"></script>
+</body>
+</html>

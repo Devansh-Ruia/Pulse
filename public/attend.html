@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse - Attendee</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .attendee-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: var(--space-4);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .room-header {
+            text-align: center;
+            margin-bottom: var(--space-6);
+        }
+        
+        .sentiment-display {
+            text-align: center;
+            margin-bottom: var(--space-4);
+        }
+        
+        .sentiment-emoji {
+            font-size: 4rem;
+            line-height: 1;
+            margin-bottom: var(--space-2);
+            transition: all 0.3s ease;
+        }
+        
+        .sentiment-value {
+            font-size: var(--font-size-lg);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+        }
+        
+        .slider-container {
+            margin-bottom: var(--space-8);
+        }
+        
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-2);
+            font-size: var(--font-size-lg);
+        }
+        
+        .tip-buttons {
+            display: flex;
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
+        }
+        
+        .tip-btn {
+            flex: 1;
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+        }
+        
+        .tip-feed {
+            margin-top: auto;
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .tip-feed-title {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-2);
+        }
+        
+        .tip-feed-item {
+            font-size: var(--font-size-sm);
+            color: var(--tip-highlight);
+            margin-bottom: var(--space-1);
+            opacity: 0.8;
+        }
+        
+        .connection-status {
+            position: absolute;
+            top: var(--space-4);
+            right: var(--space-4);
+        }
+    </style>
+</head>
+<body>
+    <div class="attendee-container">
+        <div class="connection-status">
+            <div id="connectionDot" class="connection-dot disconnected"></div>
+        </div>
+        
+        <div class="room-header">
+            <h2 id="roomTitle" class="mb-2">Loading...</h2>
+            <p class="text-secondary">Share your sentiment & support</p>
+        </div>
+        
+        <div class="sentiment-display">
+            <div id="sentimentEmoji" class="sentiment-emoji">😐</div>
+            <div id="sentimentValue" class="sentiment-value">50%</div>
+        </div>
+        
+        <div class="slider-container">
+            <div class="slider-labels">
+                <span>🧊</span>
+                <span>🔥</span>
+            </div>
+            <input 
+                type="range" 
+                id="sentimentSlider" 
+                class="sentiment-slider"
+                min="0" 
+                max="1" 
+                step="0.01" 
+                value="0.5"
+                aria-label="Sentiment slider"
+                title="Drag to adjust sentiment from cold to hot"
+            >
+        </div>
+        
+        <div class="tip-buttons">
+            <button class="btn btn-secondary tip-btn" data-amount="0.50">$0.50</button>
+            <button class="btn btn-secondary tip-btn" data-amount="1">$1</button>
+            <button class="btn btn-secondary tip-btn" data-amount="2">$2</button>
+        </div>
+        
+        <div class="tip-feed">
+            <div class="tip-feed-title">LIVE TIPS</div>
+            <div id="tipFeed"></div>
+        </div>
+    </div>
+
+    <script src="/js/shared.js"></script>
+    <script src="/js/attend.js"></script>
+</body>
+</html>
