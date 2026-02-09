@@ -244,14 +244,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     function getSentimentColor(value) {
       if (value <= 0.5) {
-        // Blue to white
         const t = value / 0.5;
         const r = Math.round(69 + (244 - 69) * t);
         const g = Math.round(137 + (244 - 137) * t);
         const b = Math.round(255 + (244 - 255) * t);
         return `rgb(${r},${g},${b})`;
       } else {
-        // White to red
         const t = (value - 0.5) / 0.5;
         const r = Math.round(244 + (218 - 244) * t);
         const g = Math.round(244 + (30 - 244) * t);
@@ -259,5 +257,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         return `rgb(${r},${g},${b})`;
       }
     }
-  })();
-//# sourceMappingURL=host.js.map
+
+  } catch (error) {
+    console.error('Initialization error:', error);
+  }
+});
