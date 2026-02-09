@@ -863,10 +863,7 @@
 
   // Format currency
   function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    return '$' + parseFloat(amount).toFixed(2);
   }
 
   // Format time
@@ -895,7 +892,7 @@
      */
     async init() {
       // The Alien app injects bridge globals into window at runtime
-      // Check if we're inside the Alien WebView
+      // Check if we're inside Alien WebView
       if (typeof window.__alien_bridge__ !== 'undefined' || 
           typeof window.alien !== 'undefined' ||
           typeof window.AlienMiniApp !== 'undefined') {
