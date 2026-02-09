@@ -43,7 +43,7 @@
           if (tipItem.parentNode) {
             tipItem.remove();
           }
-        }, 1e4);
+        }, 10000);
       };
       var handleMessage = handleMessage2, updateConnectionStatus = updateConnectionStatus2, addTipToFeed = addTipToFeed2;
       const identity = await window.AlienBridge.init();
