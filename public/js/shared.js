@@ -1127,3 +1127,13 @@ function getUrlParam(name) {
   var params = new URLSearchParams(window.location.search);
   return params.get(name);
 }
+function throttle(fn, ms) {
+  var lastCall = 0;
+  return function() {
+    var now = Date.now();
+    if (now - lastCall >= ms) {
+      lastCall = now;
+      fn.apply(this, arguments);
+    }
+  };
+}
