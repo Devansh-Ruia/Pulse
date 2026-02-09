@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (value < 0.2) label = 'Disengaged';
       else if (value < 0.4) label = 'Not feeling it';
       else if (value < 0.6) label = 'Neutral';
-      else if (value < 0.8) label = 'Engaged';
+      else if (value < 0.9) label = 'Engaged';
       else label = 'Loving it';
       
       sentimentLabel.textContent = label;
@@ -257,13 +257,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const g = Math.round(244 + (30 - 244) * t);
         const b = Math.round(244 + (40 - 244) * t);
         return `rgb(${r},${g},${b})`;
-        roomTitle.textContent = roomInfo.title;
-        roomCode.textContent = roomId.toUpperCase();
-        const baseUrl = window.location.hostname === "localhost" ? `http://localhost:3000` : window.location.origin;
-        const qrUrl = `${baseUrl}/attend.html?room=${roomId}`;
-        new QRCode(document.getElementById("qr-container"), {
-          text: qrUrl,
-          width: 128,
           height: 128,
           colorDark: "#f4f4f4",
           colorLight: "#393939",
