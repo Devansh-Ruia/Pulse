@@ -257,16 +257,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const g = Math.round(244 + (30 - 244) * t);
         const b = Math.round(244 + (40 - 244) * t);
         return `rgb(${r},${g},${b})`;
-          height: 128,
-          colorDark: "#f4f4f4",
-          colorLight: "#393939",
-          correctLevel: QRCode.CorrectLevel.L
-        });
-        roomUrl.textContent = `${window.location.hostname}/attend.html?room=${roomId}`;
-        initializeChart2();
-        ws = createWebSocket(
-          roomId,
-          alienId,
           "host",
           handleMessage2,
           (status) => {
