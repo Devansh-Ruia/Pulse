@@ -257,12 +257,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const g = Math.round(244 + (30 - 244) * t);
         const b = Math.round(244 + (40 - 244) * t);
         return `rgb(${r},${g},${b})`;
-        showToast("Failed to load room. Please try again.");
       }
-    } catch (error) {
-      console.error("Initialization error:", error);
-      showToast("Failed to load room. Please try again.");
     }
-  });
-})();
+  })();
 //# sourceMappingURL=host.js.map
