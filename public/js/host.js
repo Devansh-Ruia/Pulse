@@ -240,21 +240,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       while (tipList.children.length > 8) {
         tipList.removeChild(tipList.lastChild);
       }
-      const roomTitle = document.getElementById("roomTitle");
-      const roomCode = document.getElementById("roomCode");
-      const attendeeCount = document.getElementById("attendeeCount");
-      const totalTips = document.getElementById("totalTips");
-      const totalTipsHeader = document.getElementById("totalTipsHeader");
-      const sentimentGauge = document.getElementById("sentimentGauge");
-      const sentimentLabel = document.getElementById("sentimentLabel");
-      const tipList = document.getElementById("tipList");
-      const roomUrl = document.getElementById("roomUrl");
-      try {
-        const response = await fetch(`/api/rooms/${roomId}`);
-        if (!response.ok) {
-          throw new Error("Room not found");
-        }
-        const roomInfo = await response.json();
+    }
+
+    function getSentimentColor(value) {
+      if (value <= 0.5) {
+        // Blue to white
+        const t = value / 0.5;
+        const r = Math.round(69 + (244 - 69) * t);
+        const g = Math.round(137 + (244 - 137) * t);
+        const b = Math.round(255 + (244 - 255) * t);
+        return `rgb(${r},${g},${b})`;
+      } else {
+        // White to red
+        const t = (value - 0.5) / 0.5;
+        const r = Math.round(244 + (218 - 244) * t);
+        const g = Math.round(244 + (30 - 244) * t);
+        const b = Math.round(244 + (40 - 244) * t);
+        return `rgb(${r},${g},${b})`;
         roomTitle.textContent = roomInfo.title;
         roomCode.textContent = roomId.toUpperCase();
         const baseUrl = window.location.hostname === "localhost" ? `http://localhost:3000` : window.location.origin;
