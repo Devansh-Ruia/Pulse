@@ -1056,3 +1056,70 @@
   };
 })();
 //# sourceMappingURL=shared.js.map
+// =====================
+// WebSocket Helper
+// =====================
+function createWebSocket(roomId, alienId, role, onMessage, onStatus) {
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const url = protocol + '//' + window.location.host;
+  let ws = null;
+  let reconnectDelay = 1000;
+
+  function connect() {
+    ws = new WebSocket(url);
+
+    ws.onopen = function() {
+      reconnectDelay = 1000;
+      if (onStatus) onStatus('connected');
+      ws.send(JSON.stringify({ type: 'join', roomId: roomId, alienId: alienId, role: role }));
+    };
+
+    ws.onmessage = function(event) {
+      try {
+        var data = JSON.parse(event.data);
+        if (onMessage) onMessage(data);
+      } catch (e) {
+        console.error('Failed to parse message:', e);
+      }
+    };
+
+    ws.onclose = function() {
+      if (onStatus) onStatus('reconnecting');
+      setTimeout(function() {
+        reconnectDelay = Math.min(reconnectDelay * 2, 10000);
+        connect();
+      }, reconnectDelay);
+    };
+
+    ws.onerror = function() {
+      if (onStatus) onStatus('disconnected');
+      ws.close();
+    };
+  }
+
+  connect();
+  return ws;
+}
+
+// =====================
+// Toast Notification
+// =====================
+function showToast(message) {
+  var toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#393939;color:#f4f4f4;padding:12px 24px;font-size:14px;font-family:IBM Plex Sans,sans-serif;border-left:4px solid #ff8389;z-index:9999;';
+  document.body.appendChild(toast);
+  setTimeout(function() { toast.remove(); }, 3000);
+}
+
+// =====================
+// Formatting Helpers
+// =====================
+function formatCurrency(amount) {
+  return '$' + parseFloat(amount).toFixed(2);
+}
+
+function formatTime(ts) {
+  var d = new Date(ts);
+  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
