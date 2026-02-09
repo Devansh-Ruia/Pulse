@@ -1123,3 +1123,7 @@ function formatTime(ts) {
   var d = new Date(ts);
   return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 }
+function getUrlParam(name) {
+  var params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
