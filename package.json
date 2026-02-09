@@ -1,21 +1,29 @@
 {
   "name": "pulse",
   "version": "1.0.0",
-  "description": "Real-time event sentiment + micro-tipping mini-app for Alien hackathon",
+  "description": "Real-time event sentiment & micro-tipping for Alien ecosystem",
   "main": "server.js",
   "scripts": {
+    "build": "node build.js",
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node build.js && node server.js"
   },
+  "keywords": [
+    "alien",
+    "sentiment",
+    "tipping",
+    "websocket",
+    "real-time"
+  ],
+  "author": "Devansh Ruia",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "ws": "^8.14.2",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "@alien_org/bridge": "^1.0.0"
   },
-  "engines": {
-    "node": ">=16.0.0"
-  },
-  "keywords": ["alien", "hackathon", "websocket", "sentiment", "tipping"],
-  "author": "",
-  "license": "MIT"
+  "devDependencies": {
+    "esbuild": "^0.19.12"
+  }
 }
