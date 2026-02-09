@@ -5,16 +5,16 @@ let alienId = null;
 let sentimentChart = null;
 let sentimentData = [];
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async function() {
   try {
-    // Initialize the bridge (gets alienId from JWT or mock)
     const identity = await AlienBridge.init();
     const alienId = identity.alienId;
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get('room');
     
-    // Get room ID from URL
-    roomId = getUrlParam('room');
     if (!roomId) {
-      showToast('No room ID provided');
+      alert('No room code provided');
+      window.location.href = '/';
       return;
     }
 
@@ -257,14 +257,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const g = Math.round(244 + (30 - 244) * t);
         const b = Math.round(244 + (40 - 244) * t);
         return `rgb(${r},${g},${b})`;
-          "host",
-          handleMessage2,
-          (status) => {
-            console.log("Connection status:", status);
-          }
-        );
-      } catch (error) {
-        console.error("Initialization error:", error);
         showToast("Failed to load room. Please try again.");
       }
     } catch (error) {
